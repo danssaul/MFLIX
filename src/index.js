@@ -1,6 +1,6 @@
 import MongoConnection from "./db/MongoConnection.js";
 import dotenv from "dotenv";
-import ValidationUser from "./validation/validationUser.js";
+import ValidationAccount from "./validation/ValidationAccount.js";
 import bcrypt from "bcrypt";
 
 dotenv.config();
@@ -9,7 +9,7 @@ const {
     DB_NAME,
     COLLECTION_NAME_MOVIES,
     COLLECTION_NAME_COMMENTS,
-    COLLECTION_NAME_USERS,
+    COLLECTION_NAME_ACCOUNTS,
     COLLECTION_NAME_FAVORITES
 } = process.env;
 
@@ -19,9 +19,9 @@ connection.connectToDatabase().then(() => {
     console.log("Connected to the database successfully");
 });
 
-const users = await connection.getCollection(COLLECTION_NAME_USERS);
+const users = await connection.getCollection(COLLECTION_NAME_ACCOUNTS);
 
-const validation = new ValidationUser();
+const validation = new ValidationAccount();
 const user = {
     username: "John Doe",
     email: "daniel@gmail.com",
@@ -33,4 +33,3 @@ console.log(validation.getValueValidated(user));
 users.insertOne(validation.getValueValidated(user)).then(() => {
     console.log("User inserted successfully");
 });
-
