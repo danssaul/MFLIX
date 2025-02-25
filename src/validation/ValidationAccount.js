@@ -2,7 +2,7 @@ import Joi from 'joi';
 import { joiPasswordExtendCore } from "joi-password";
 const joiPassword = Joi.extend(joiPasswordExtendCore);
 
-export default class ValidationUser {
+export default class ValidationAccount {
     constructor() {
         this.schemaUsers = Joi.object({
 
