@@ -2,6 +2,7 @@ import MongoConnection from "./db/MongoConnection.js";
 import dotenv from "dotenv";
 import ValidationAccount from "./validation/ValidationAccount.js";
 import bcrypt from "bcrypt";
+import Service from "./service/AccountService.js";
 
 dotenv.config();
 const {
@@ -23,13 +24,35 @@ const users = await connection.getCollection(COLLECTION_NAME_ACCOUNTS);
 
 const validation = new ValidationAccount();
 const user = {
-    username: "John Doe",
-    email: "daniel@gmail.com",
-    password: "Password123!"
+    "username": "Daniel",
+    "email": "jocsa@gmail.com",
+    "password": "Password123!",
+    "blocked": true,
 };
 
-console.log(validation.getValueValidated(user));
 
-users.insertOne(validation.getValueValidated(user)).then(() => {
+const service = new Service(connection, users);
+
+await service.addAdminAccount(user).then(() => {
     console.log("User inserted successfully");
 });
+
+await service.setRole(user.email, "settedROlelll").then(() => {
+    console.log("Role setted successfully");
+});
+
+await service.updatePassword(user.email, "Password123456!").then(() => {
+    console.log("Password updated successfully");
+});
+
+await service.blockUnblockAccount(user.email).then(() => {
+    console.log("Account blocked/unblocked successfully");
+});
+
+await service.deleteAccount(user.email).then(() => {
+    console.log("Account deleted successfully")
+});
+
+await service.login(user.email, user.password).then(() => {
+    console.log("Login successfully");
+});  
