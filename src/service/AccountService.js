@@ -1,8 +1,10 @@
 import bcrypt from 'bcrypt';
 import JwtUtils from '../utils/token.js';
 import { getExpirationIn } from '../utils/expiration.js';
+import dotenv from 'dotenv';
+import MongoConnection from "../db/MongoConnection.js";
 
-export default class AccountService {
+class AccountService {
     constructor(connection, collection) {
         this.connection = connection;
         this.collection = collection;
@@ -37,6 +39,9 @@ export default class AccountService {
             throw new Error('Account not found');
         }
         await this.collection.updateOne({ email }, { $set: { role } });
+        account.role = role;
+        const updatedAccount = this.#prepareAccountForInsertion(account);
+        return updatedAccount;
     };
 
     updatePassword = async (email, newPassword) => {
@@ -56,14 +61,6 @@ export default class AccountService {
     getAccountByEmail = async (email) => {
         return await this.collection.findOne({ email });
     };
-
-    getAccountByEmail = async (email) => {
-
-        return await this.collection.findOne({
-            email: email
-        });
-
-    }
 
     #prepareAccountForInsertion = (account) => {
 
@@ -125,3 +122,16 @@ export default class AccountService {
     }
 
 }
+
+dotenv.config();
+const {
+    CONNECTION_STRING,
+    DB_NAME,
+    COLLECTION_NAME_ACCOUNTS
+} = process.env;
+
+const connection = new MongoConnection(CONNECTION_STRING, DB_NAME);
+const users = await connection.getCollection(COLLECTION_NAME_ACCOUNTS);
+
+const service = new AccountService(connection, users);
+export default service;
