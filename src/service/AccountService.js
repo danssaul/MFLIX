@@ -1,16 +1,14 @@
 import bcrypt from 'bcrypt';
 import JwtUtils from '../utils/token.js';
 import { getExpirationIn } from '../utils/expiration.js';
+import dotenv from 'dotenv';
+import MongoConnection from "../db/MongoConnection.js";
 
-export default class AccountService {
+class AccountService {
     constructor(connection, collection) {
         this.connection = connection;
         this.collection = collection;
     }
-
-    getCollection = async (collectionName) => {
-        return this.connection.getCollection(collectionName);
-    };
 
     addUserAccount = async (account) => {
         account.role = 'user';
@@ -27,8 +25,8 @@ export default class AccountService {
             throw new Error('Account already exists');
         }
         const newAccount = this.#prepareAccountForInsertion(account);
-        await this.collection.insertOne(newAccount);
-        return newAccount;
+        const { insertedId } = await this.collection.insertOne(newAccount);
+        return await this.collection.findOne({ _id: insertedId });
     };
 
     setRole = async (email, role) => {
@@ -37,6 +35,9 @@ export default class AccountService {
             throw new Error('Account not found');
         }
         await this.collection.updateOne({ email }, { $set: { role } });
+        account.role = role;
+        const updatedAccount = this.#prepareAccountForInsertion(account);
+        return updatedAccount;
     };
 
     updatePassword = async (email, newPassword) => {
@@ -57,12 +58,16 @@ export default class AccountService {
         return await this.collection.findOne({ email });
     };
 
-    getAccountByEmail = async (email) => {
-
-        return await this.collection.findOne({
-            email: email
-        });
-
+    updateMoviesVoted = async (email, movieId) => {
+        const account = await this.getAccountByEmail(email);
+        if (!account) {
+            throw new Error('Account not found');
+        }
+        await this.collection.updateOne
+            (
+                { email },
+                { $push: { moviesVoted: movieId } }
+            );
     }
 
     #prepareAccountForInsertion = (account) => {
@@ -76,7 +81,8 @@ export default class AccountService {
             role: account.role,
             blocked: false,
             password: hashPassword,
-            expiration
+            expiration,
+            moviesVoted: [],
         };
 
         return Account;
@@ -124,4 +130,24 @@ export default class AccountService {
 
     }
 
+    async updateNumComments(movie_id) {
+        await this.collection.updateOne(
+            { "imdb.id": movie_id },
+            { $inc: { "imdb.num_mflix_comments": 1 } }
+        )
+    }
+
 }
+
+dotenv.config();
+const {
+    CONNECTION_STRING,
+    DB_NAME,
+    COLLECTION_NAME_ACCOUNTS
+} = process.env;
+
+const connection = new MongoConnection(CONNECTION_STRING, DB_NAME);
+const users = await connection.getCollection(COLLECTION_NAME_ACCOUNTS);
+
+const accountService = new AccountService(connection, users);
+export default accountService;

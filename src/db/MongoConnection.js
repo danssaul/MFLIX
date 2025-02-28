@@ -1,4 +1,4 @@
-import { MongoClient, ServerApiVersion } from "mongodb";
+import { MongoClient, ServerApiVersion, ObjectId } from "mongodb";
 
 export default class MongoConnection {
     #client;
@@ -17,6 +17,10 @@ export default class MongoConnection {
 
     async getCollection(collectionName) {
         return this.#db.collection(collectionName);
+    }
+
+    getObjectId(id) {
+        return new ObjectId(id);
     }
 
     get client() {

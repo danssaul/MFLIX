@@ -1,0 +1,66 @@
+import MongoConnection from "../db/MongoConnection.js";
+import dotenv from 'dotenv';
+import { ObjectId } from "mongodb";
+
+//{_id:<ObjectID>, email:<email string>, movie_id:<ObjectId of movie>, viewed: <true|false>, “feed_back”:<optional free text>}}
+
+class FavoriteService {
+    constructor(connection, collection) {
+        this.connection = connection;
+        this.collection = collection;
+    }
+
+    addFavorite = async (favorite) => {
+        const existingFavorite = await userFavorites.findOne({
+            movie_id: new ObjectId(favorite.movie_id),
+            email: favorite.email
+        });
+        if (existingFavorite) throw new Error('Movie already added to favorites.');
+
+        favorite.viewed = false;
+        favorite.movie_id = new ObjectId(favorite.movie_id);
+        const { insertedId } = await this.collection.insertOne(favorite);
+        const newFavorite = await this.collection.findOne({ _id: insertedId });
+
+        await userFavorites.insertOne({ email: favorite.email, movie_id: new ObjectId(favorite.movie_id) });
+        return newFavorite;
+    }
+
+    getFavoritesByEmail = async (email) => {
+        return await this.collection.find({ email: email }).toArray();
+    }
+
+    updateFavorite = async (id, viewed, feedback) => {
+        const favorite = await this.collection.findOneAndUpdate(
+            { _id: new ObjectId(id) },
+            { $set: { viewed, feedback } },
+            { returnDocument: 'after' }
+        )
+        return favorite;
+    }
+
+    deleteFavorite = async (id, email) => {
+        const favorite = await this.collection.findOneAndDelete({ _id: new ObjectId(id)});
+        if (!favorite) throw new Error("Favorite not found.");
+
+        await this.collection.deleteOne({ _id: new ObjectId(id) });
+        await userFavorites.deleteOne({ email, movie_id: favorite.movie_id });
+        return favorite;
+    }
+}
+
+dotenv.config();
+const {
+    CONNECTION_STRING,
+    DB_NAME,
+    COLLECTION_NAME_FAVORITES,
+    COLLECTION_NAME_USER_FAVORITES
+} = process.env;
+
+const connection = new MongoConnection(CONNECTION_STRING, DB_NAME);
+const userFavorites = await connection.getCollection(COLLECTION_NAME_USER_FAVORITES);
+
+const favorites = await connection.getCollection(COLLECTION_NAME_FAVORITES);
+const favoriteService = new FavoriteService(connection, favorites);
+
+export default favoriteService;
