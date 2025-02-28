@@ -10,10 +10,6 @@ class AccountService {
         this.collection = collection;
     }
 
-    getCollection = async (collectionName) => {
-        return this.connection.getCollection(collectionName);
-    };
-
     addUserAccount = async (account) => {
         account.role = 'user';
         return this.#createAccount(account);
@@ -29,8 +25,8 @@ class AccountService {
             throw new Error('Account already exists');
         }
         const newAccount = this.#prepareAccountForInsertion(account);
-        await this.collection.insertOne(newAccount);
-        return newAccount;
+        const { insertedId } = await this.collection.insertOne(newAccount);
+        return await this.collection.findOne({ _id: insertedId });
     };
 
     setRole = async (email, role) => {
@@ -62,6 +58,18 @@ class AccountService {
         return await this.collection.findOne({ email });
     };
 
+    updateMoviesVoted = async (email, movieId) => {
+        const account = await this.getAccountByEmail(email);
+        if (!account) {
+            throw new Error('Account not found');
+        }
+        await this.collection.updateOne
+            (
+                { email },
+                { $push: { moviesVoted: movieId } }
+            );
+    }
+
     #prepareAccountForInsertion = (account) => {
 
         const hashPassword = bcrypt.hashSync(account.password, 10);
@@ -73,7 +81,8 @@ class AccountService {
             role: account.role,
             blocked: false,
             password: hashPassword,
-            expiration
+            expiration,
+            moviesVoted: [],
         };
 
         return Account;
@@ -121,6 +130,13 @@ class AccountService {
 
     }
 
+    async updateNumComments(movie_id) {
+        await this.collection.updateOne(
+            { "imdb.id": movie_id },
+            { $inc: { "imdb.num_mflix_comments": 1 } }
+        )
+    }
+
 }
 
 dotenv.config();
@@ -133,5 +149,5 @@ const {
 const connection = new MongoConnection(CONNECTION_STRING, DB_NAME);
 const users = await connection.getCollection(COLLECTION_NAME_ACCOUNTS);
 
-const service = new AccountService(connection, users);
-export default service;
+const accountService = new AccountService(connection, users);
+export default accountService;
