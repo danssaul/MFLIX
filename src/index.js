@@ -10,6 +10,11 @@ import commentsRouter from "./controller/comments.js";
 import favoriteService from "./service/FavoriteService.js";
 import favoritesRouter from "./controller/favorites.js";
 
+dotenv.config();
+const {
+    CONNECTION_STRING,
+    DB_NAME,
+} = process.env;
 
 const connection = new MongoConnection(CONNECTION_STRING, DB_NAME);
 
