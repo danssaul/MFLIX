@@ -3,7 +3,7 @@ import { getExpirationIn } from '../utils/expiration.js';
 export default class JwtUtils {
     static getJwt(account) {
        return jwt.sign({role: account.role}, process.env.JWT_SECRET, {
-        subject:account.username,
+        subject:account.email,
         expiresIn: getExpirationIn() + ""
        })
     }

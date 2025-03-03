@@ -17,8 +17,29 @@ const AccountPaths = {
     }
   },
   GET: {
-    authentication: () => false,
-    authorization: () => true
+    authentication: () => 'jwt',
+    authorization: (req) => {
+      return req.user === process.env.ADMIN_EMAIL || req.user === req.params.email;
+    }
+  },
+  PATCH: {
+    authentication: () => 'jwt',
+    authorization: (req) => {
+      if (req.path.includes('/password')) {
+        return req.user === process.env.ADMIN_EMAIL || req.user === req.params.email;
+      } else if (req.path.includes('/roles')) {
+        return req.user === process.env.ADMIN_EMAIL;
+      } else if (req.path.includes('/block')) {
+        return req.user === process.env.ADMIN_EMAIL;
+      }
+      return false;
+    }
+  },
+  DELETE: {
+    authentication: () => 'jwt',
+    authorization: (req) => {
+      return req.user === process.env.ADMIN_EMAIL || req.user === req.params.email;
+    }
   }
 };
 

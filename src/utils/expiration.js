@@ -7,7 +7,7 @@ const time_units = {
 };
 
 export function getExpirationIn() {
-    const expiredInStr = "1s";
+    const expiredInStr = "1d";
     const amount = expiredInStr.split(/\D/)[0];
     const parseArray = expiredInStr.split(/\d/);
     const index = parseArray.findIndex((e) => !!e.trim());

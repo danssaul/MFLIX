@@ -6,6 +6,7 @@ import { createError } from '../utils/error.js';
 dotenv.config();
 const BEARER = "Bearer ";
 const BASIC = "Basic ";
+
 export function authenticate() {
     return async (req, res, next) => {
         const authHeader = req.header("Authorization");
@@ -28,7 +29,9 @@ function jwtAuthentication(req, authHeader) {
         req.user = payload.sub;
         req.role = payload.role;
         req.authType = "jwt";
-    } catch (error) { }
+    } catch (error) {
+        throw createError(401, "Invalid token");
+    }
 }
 
 async function basicAuthentication(req, authHeader) {
@@ -37,7 +40,6 @@ async function basicAuthentication(req, authHeader) {
         "utf-8"
     );
     const userNamePasswordArr = userNamePassword.split(":");
-
     try {
         if (userNamePasswordArr[0] === process.env.ADMIN_EMAIL) {
             if (userNamePasswordArr[1] === process.env.ADMIN_PASSWORD) {
@@ -52,7 +54,9 @@ async function basicAuthentication(req, authHeader) {
             req.role = account.role;
             req.authType = "basic";
         }
-    } catch (error) { }
+    } catch (error) {
+        throw createError(401, "Invalid credentials");
+    }
 }
 
 export function auth(paths) {
@@ -66,7 +70,7 @@ export function auth(paths) {
                 throw createError(401, "no required authentication");
             }
             if (!authorization(req)) {
-                throw createError(403, "");
+                throw createError(403, "not authorized");
             }
         }
         next();
