@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { getExpirationIn } from '../utils/expiration.js';
 export default class JwtUtils {
-    static getJwt(serviceAccount) {
-       return jwt.sign({role: serviceAccount.role}, process.env.JWT_SECRET, {
-        subject:serviceAccount.username,
+    static getJwt(account) {
+       return jwt.sign({role: account.role}, process.env.JWT_SECRET, {
+        subject:account.username,
         expiresIn: getExpirationIn() + ""
        })
     }

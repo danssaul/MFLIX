@@ -2,9 +2,11 @@ import express from 'express';
 import service from '../service/AccountService.js';
 import { validateBody, validateParam } from '../utils/validator.js';
 import { schemas } from '../validation/schemas.js';
+import  AccountPaths  from '../security/AccountPaths.js';
+import { auth } from '../security/authenticate.js'
 
 const accountsRouter = express.Router();
-
+accountsRouter.use(auth(AccountPaths));
 accountsRouter.post('/user', validateBody(schemas.schemaPostAccount), async (req, res) => {
     try {
         const newAccount = await service.addUserAccount(req.body);

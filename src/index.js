@@ -7,6 +7,7 @@ import commentsRouter from "./controller/comments.js";
 import favoritesRouter from "./controller/favorites.js";
 import { logger } from "./utils/logger.js";
 import { errorHandler } from "./utils/error.js";
+import { authenticate } from "./security/authenticate.js";
 
 dotenv.config();
 const {
@@ -23,6 +24,7 @@ connection.connectToDatabase().then(() => {
 const app = express();
 app.use(express.json());
 app.use(logger);
+app.use(authenticate());
 app.use('/accounts', accountsRouter);
 app.use('/movies', moviesRouter);
 app.use('/comments', commentsRouter);
