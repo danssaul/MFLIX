@@ -22,11 +22,11 @@ connection.connectToDatabase().then(() => {
 
 const app = express();
 app.use(express.json());
+app.use(logger);
 app.use('/accounts', accountsRouter);
 app.use('/movies', moviesRouter);
 app.use('/comments', commentsRouter);
 app.use('/favorites', favoritesRouter);
-app.use(logger);
 app.use(errorHandler);
 
 const port = process.env.PORT || 3500;
