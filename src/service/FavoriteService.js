@@ -1,8 +1,7 @@
 import MongoConnection from "../db/MongoConnection.js";
 import dotenv from 'dotenv';
 import { ObjectId } from "mongodb";
-
-//{_id:<ObjectID>, email:<email string>, movie_id:<ObjectId of movie>, viewed: <true|false>, “feed_back”:<optional free text>}}
+import { createError } from '../utils/error.js';
 
 class FavoriteService {
     constructor(connection, collection) {
@@ -15,7 +14,7 @@ class FavoriteService {
             movie_id: new ObjectId(favorite.movie_id),
             email: favorite.email
         });
-        if (existingFavorite) throw new Error('Movie already added to favorites.');
+        if (existingFavorite) throw createError(409, "movie already added to favorites");
 
         favorite.viewed = false;
         favorite.movie_id = new ObjectId(favorite.movie_id);
@@ -27,7 +26,9 @@ class FavoriteService {
     }
 
     getFavoritesByEmail = async (email) => {
-        return await this.collection.find({ email: email }).toArray();
+        const favorites = await this.collection.find({ email: email }).toArray();
+        if (favorites.length === 0) throw createError(404, "favorites not found");
+        return favorites;
     }
 
     updateFavorite = async (id, viewed, feedback) => {
@@ -40,8 +41,8 @@ class FavoriteService {
     }
 
     deleteFavorite = async (id, email) => {
-        const favorite = await this.collection.findOneAndDelete({ _id: new ObjectId(id)});
-        if (!favorite) throw new Error("Favorite not found.");
+        const favorite = await this.collection.findOneAndDelete({ _id: new ObjectId(id) });
+        if (!favorite) throw createError(404, "favorite not found");
 
         await this.collection.deleteOne({ _id: new ObjectId(id) });
         await userFavorites.deleteOne({ email, movie_id: favorite.movie_id });

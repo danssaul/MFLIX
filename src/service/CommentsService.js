@@ -2,6 +2,7 @@ import MongoConnection from "../db/MongoConnection.js";
 import dotenv from "dotenv";
 import { ObjectId } from "mongodb";
 import accountService from "./AccountService.js";
+import { createError } from "../utils/error.js";
 
 
 class CommentService {
@@ -11,12 +12,13 @@ class CommentService {
     }
 
     async getCommentsByMovieID(id) {
-        return await this.collection.find({ movie_id: new ObjectId(id) }).toArray();
+        const comment = await this.collection.find({ movie_id: new ObjectId(id) }).toArray();
+        if (comment.length === 0) throw createError(404, 'Comment not found');
+        return comment;
     }
 
     async addComment(comment) {
         await movies.updateOne({ _id: new ObjectId(comment.movie_id) }, { $inc: { num_mflix_comments: 1 } });
-        comment.date = new Date();
         const { insertedId } = await this.collection.insertOne(comment);
         return await this.collection.findOne({ _id: insertedId });
     }
@@ -24,18 +26,21 @@ class CommentService {
     async updateComment(id, text) {
         const comment = await this.collection.findOneAndUpdate(
             { _id: new ObjectId(id) },
-            { $set: { text } }
+            { $set: { text } },
+            { returnDocument: 'after' }
         );
         return comment;
     }
 
     async getCommentsByEmail(email) {
-        return await this.collection.find({ email: email }).toArray();
+        const comment = await this.collection.find({ email: email }).toArray();
+        if (comment.length === 0) throw createError(404, 'Comment not found');
+        return comment;
     }
 
     async deleteCommentByID(id) {
         const comment = await this.collection.findOneAndDelete({ _id: new ObjectId(id) });
-        if (!comment) throw new Error('comment not found');
+        if (!comment) throw createError(404, 'Comment not found');
         await movies.updateOne({ _id: new ObjectId(comment.movie_id) }, { $inc: { num_mflix_comments: -1 } });
         return comment;
     }

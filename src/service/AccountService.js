@@ -3,6 +3,7 @@ import JwtUtils from '../utils/token.js';
 import { getExpirationIn } from '../utils/expiration.js';
 import dotenv from 'dotenv';
 import MongoConnection from "../db/MongoConnection.js";
+import { createError } from '../utils/error.js';
 
 class AccountService {
     constructor(connection, collection) {
@@ -22,7 +23,7 @@ class AccountService {
 
     #createAccount = async (account) => {
         if (await this.getAccountByEmail(account.email)) {
-            throw new Error('Account already exists');
+            throw createError(409, "Account already exists");
         }
         const newAccount = this.#prepareAccountForInsertion(account);
         const { insertedId } = await this.collection.insertOne(newAccount);
@@ -30,9 +31,9 @@ class AccountService {
     };
 
     setRole = async (email, role) => {
-        const account = await this.getAccountByEmail(email);
+        const account = await this.collection.findOne({ email });
         if (!account) {
-            throw new Error('Account not found');
+            throw createError(404, 'Account not found');
         }
         await this.collection.updateOne({ email }, { $set: { role } });
         account.role = role;
@@ -41,9 +42,9 @@ class AccountService {
     };
 
     updatePassword = async (email, newPassword) => {
-        const account = await this.getAccountByEmail(email);
+        const account = await this.collection.findOne({ email });
         if (!account) {
-            throw new Error('Account not found');
+            throw createError(404, 'Account not found');
         }
         if (bcrypt.compareSync(newPassword, account.password)) {
             throw new Error('Password is the same');
@@ -55,13 +56,17 @@ class AccountService {
     };
 
     getAccountByEmail = async (email) => {
-        return await this.collection.findOne({ email });
+        const account = await this.collection.findOne({ email });
+        if (!account) {
+            throw createError(404, 'Account not found');
+        }
+        return account;
     };
 
     updateMoviesVoted = async (email, movieId) => {
-        const account = await this.getAccountByEmail(email);
+        const account = await this.collection.findOne({ email });
         if (!account) {
-            throw new Error('Account not found');
+            throw createError(404, 'Account not found');
         }
         await this.collection.updateOne
             (
@@ -91,9 +96,9 @@ class AccountService {
 
 
     blockUnblockAccount = async (email) => {
-        const account = await this.getAccountByEmail(email);
+        const account = await this.collection.findOne({ email });
         if (!account) {
-            throw new Error('Account not found');
+            throw createError(404, 'Account not found');
         }
         await this.collection.updateOne(
             { email },
@@ -102,18 +107,18 @@ class AccountService {
     };
 
     deleteAccount = async (email) => {
-        const account = await this.getAccountByEmail(email);
+        const account = await this.collection.findOne({ email });
         if (!account) {
-            throw new Error('Account not found');
+            throw createError(404, 'Account not found');
         }
         await this.collection.deleteOne({ email });
     };
 
     login = async (email, password) => {
 
-        const account = await this.getAccountByEmail(email);
+        const account = await this.collection.findOne({ email });
         if (!account) {
-            throw new Error('Account not found');
+            throw createError(404, 'Account not found');
         }
 
         const accountToBeChecked = this.#prepareAccountForInsertion(account);

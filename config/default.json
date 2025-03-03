@@ -1,0 +1,6 @@
+{
+    "morgan": {
+        "type": "common",
+        "stream":"console"
+    }
+}

@@ -1,38 +1,40 @@
 import express from 'express';
 import movieService from '../service/MovieService.js';
+import { validateBody, validateParam } from '../utils/validator.js';
+import { schemas } from '../validation/schemas.js';
 
 const moviesRouter = express.Router();
 
-moviesRouter.get('/:id', async (req, res) => {
+moviesRouter.get('/:id', validateParam(schemas.schemaId), async (req, res) => {
     try {
         const movie = await movieService.getMovieByID(req.params.id);
         res.send(movie).status(200);
     } catch (error) {
-        res.status(400).send({ error: error.message });
+        res.status(error.status).send({ error: error.message });
     }
 });
 
-moviesRouter.post('/most-rated', async (req, res) => {
+moviesRouter.post('/most-rated', validateBody(schemas.schemaMostRatedAndCommented), async (req, res) => {
     try {
         const { year, actor, genres, language, amount } = req.body;
         const movies = await movieService.getMostRatedMoviesByFilter({ year, actor, genres, language, amount });
         res.status(200).send(movies);
     } catch (error) {
-        res.status(400).send({ error: error.message });
+        res.status(error.status).send({ error: error.message });
     }
 });
 
-moviesRouter.post('/most-commented', async (req, res) => {
+moviesRouter.post('/most-commented', validateBody(schemas.schemaMostRatedAndCommented), async (req, res) => {
     try {
         const { year, actor, genres, language, amount } = req.body;
         const movies = await movieService.getMostCommentedMoviesByFilter({ year, actor, genres, language, amount });
         res.status(200).send(movies);
     } catch (error) {
-        res.status(400).send({ error: error.message });
+        res.status(error.status).send({ error: error.message });
     }
 });
 
-moviesRouter.patch('/:imdb', async (req, res) => {
+moviesRouter.patch('/:imdb', validateBody(schemas.schemaUpdateMovieRating), validateParam(schemas.schemaImdbId), async (req, res) => {
     try {
         const { rating, email} = req.body;
         const imdb = parseInt(req.params.imdb);
@@ -41,7 +43,7 @@ moviesRouter.patch('/:imdb', async (req, res) => {
 
         res.status(200).send({ message: 'Movie updated successfully' });
     } catch (error) {
-        res.status(400).send({ error: error.message });
+        res.status(error.status).send({ error: error.message });
     }
 });
 
