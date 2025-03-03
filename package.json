@@ -14,12 +14,15 @@
   "description": "",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "config": "^3.3.12",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "joi": "^17.13.3",
     "joi-password": "^4.2.0",
     "jsonwebtoken": "^9.0.2",
-    "mongodb": "^6.13.1"
+    "mongodb": "^6.13.1",
+    "morgan": "^1.10.0",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

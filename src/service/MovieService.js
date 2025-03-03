@@ -2,6 +2,7 @@ import accountService from "./AccountService.js";
 import dotenv from "dotenv";
 import MongoConnection from "../db/MongoConnection.js";
 import { ObjectId } from "mongodb";
+import { createError } from '../utils/error.js';
 
 class MovieService {
 
@@ -15,7 +16,9 @@ class MovieService {
     }
 
     getMoviesByImdbId = async (id) => {
-        return await this.collection.find({ "imdb.id": id }).toArray();
+        const movies = await this.collection.find({ "imdb.id": id }).toArray();
+        if (movies.length === 0) throw createError(404, "Movie not found");
+        return movies;
     }
 
     async getMostRatedMoviesByFilter({ year, actor, genres, language, amount }) {
