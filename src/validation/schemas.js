@@ -20,7 +20,7 @@ const properties = {
         .doesNotInclude(["password", "12345"])
         .required(),
     email: Joi.string().email().required(),
-    role: Joi.string().valid("admin", "user")
+    role: Joi.string().valid("admin", "user", "premium_user")
         .required(),
 
     id: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),

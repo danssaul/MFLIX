@@ -22,7 +22,8 @@ class AccountService {
     };
 
     #createAccount = async (account) => {
-        if (await this.getAccountByEmail(account.email)) {
+        const accountChecked = await this.collection.findOne({ email: account.email });
+        if (accountChecked) {
             throw createError(409, "Account already exists");
         }
         const newAccount = this.#prepareAccountForInsertion(account);
@@ -86,7 +87,7 @@ class AccountService {
             role: account.role,
             blocked: false,
             password: hashPassword,
-            expiration,
+            expiration: expiration,
             moviesVoted: [],
         };
 
@@ -121,17 +122,17 @@ class AccountService {
             throw createError(404, 'Account not found');
         }
 
-        const accountToBeChecked = this.#prepareAccountForInsertion(account);
+        account.expiration =Date.now() + getExpirationIn();
 
         if (!bcrypt.compareSync(password, account.password)) {
-            throw new Error('Invalid password');
+            throw createError(401,'passwords do not match');
         }
 
-        if (new Date().getTime() > accountToBeChecked.expiration) {
-            throw new Error('Session expired');
+        if (new Date().getTime() > account.expiration) {
+            throw createError(403, 'Account session has expired. Please log in again.');
         }
 
-        return JwtUtils.getJwt(accountToBeChecked);
+        return JwtUtils.getJwt(account);
 
     }
 
