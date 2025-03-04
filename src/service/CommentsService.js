@@ -29,6 +29,7 @@ class CommentService {
             { $set: { text } },
             { returnDocument: 'after' }
         );
+        if (!comment) throw createError(404, 'Comment not found');
         return comment;
     }
 
@@ -46,7 +47,6 @@ class CommentService {
     }
 
     async getCommentById(id){
-        console.log(`Fetching comment with ID: ${id}`);
         const comment = await this.collection.findOne({ _id: new ObjectId(id) });
         if (!comment) throw createError(404, 'Comment not found');
         return comment;

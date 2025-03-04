@@ -20,7 +20,10 @@ const CommentsPaths = {
         const comment = await commentService.getCommentById(req.params.id);
         return req.role === 'admin' || (req.role === 'premium_user' && comment.email === req.user);
       } catch (error) {
-        return false;
+        if (error.message === 'Comment not found') {
+          return { authorized: false, status: 404, message: 'Comment not found' };
+        }
+        return { authorized: false, status: 500, message: 'Internal server error' };
       }
     }
   }
