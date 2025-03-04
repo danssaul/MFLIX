@@ -31,6 +31,8 @@ const AccountPaths = {
         return req.user === process.env.ADMIN_EMAIL;
       } else if (req.path.includes('/block')) {
         return req.user === process.env.ADMIN_EMAIL;
+      } else if (req.path.includes('/unblock')){
+        return req.user === process.env.ADMIN_EMAIL;
       }
       return false;
     }
