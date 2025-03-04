@@ -45,6 +45,13 @@ class CommentService {
         return comment;
     }
 
+    async getCommentById(id){
+        console.log(`Fetching comment with ID: ${id}`);
+        const comment = await this.collection.findOne({ _id: new ObjectId(id) });
+        if (!comment) throw createError(404, 'Comment not found');
+        return comment;
+    }
+
 }
 
 dotenv.config();

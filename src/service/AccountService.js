@@ -89,6 +89,7 @@ class AccountService {
             password: hashPassword,
             expiration: expiration,
             moviesVoted: [],
+            numGetRequest: 0
         };
 
         return Account;

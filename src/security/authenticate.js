@@ -60,17 +60,24 @@ async function basicAuthentication(req, authHeader) {
 }
 
 export function auth(paths) {
-    return (req, res, next) => {
+    return async (req, res, next) => {
         const { authentication, authorization } = paths[req.method];
         if (!authorization) {
-            throw createError(500, "security configuration not provided");
+            return res.status(500).send({ error: "security configuration not provided" });
         }
         if (authentication(req)) {
             if (req.authType !== authentication(req)) {
-                throw createError(401, "no required authentication");
+                return res.status(401).send({ error: "no required authentication" });
             }
-            if (!authorization(req)) {
-                throw createError(403, "not authorized");
+            console.log(`Authorization check for user: ${req.user}, role: ${req.role}, email: ${req.params.email}`);
+            try {
+                const isAuthorized = await authorization(req);
+                console.log(`Authorization result: ${isAuthorized}`);
+                if (!isAuthorized) {
+                    return res.status(403).send({ error: "not authorized" });
+                }
+            } catch (error) {
+                return res.status(error.status || 500).send({ error: error.message });
             }
         }
         next();
