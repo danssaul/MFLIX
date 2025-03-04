@@ -77,10 +77,12 @@ dotenv.config();
 const {
     CONNECTION_STRING,
     DB_NAME,
-    COLLECTION_NAME_MOVIES
+    COLLECTION_NAME_MOVIES,
+    COLLECTION_NAME_ACCOUNTS
 } = process.env;
 
 const connection = new MongoConnection(CONNECTION_STRING, DB_NAME);
+const accounts = await connection.getCollection(COLLECTION_NAME_ACCOUNTS);
 const movies = await connection.getCollection(COLLECTION_NAME_MOVIES);
 const movieService = new MovieService(connection, movies);
 

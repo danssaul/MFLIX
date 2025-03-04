@@ -37,6 +37,7 @@ class FavoriteService {
             { $set: { viewed, feedback } },
             { returnDocument: 'after' }
         )
+        if (!favorite) throw createError(404, "favorite not found");
         return favorite;
     }
 
