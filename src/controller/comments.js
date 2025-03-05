@@ -18,7 +18,7 @@ commentsRouter.get('/comment/:id', validateParam(schemas.schemaId), auth(Comment
     res.status(200).send(comments);
 }));
 
-commentsRouter.post('/', validateBody(schemas.schemaUpdateComment), asyncHandler(async (req, res) => {
+commentsRouter.post('/', validateBody(schemas.schemaUpdateComment), auth(CommentsPaths), asyncHandler(async (req, res) => {
     const updatedComment = await commentService.updateComment(req.body.id, req.body.text);
     res.status(200).send(updatedComment);
 }));

@@ -40,6 +40,8 @@ async function basicAuthentication(req, authHeader) {
         "utf-8"
     );
     const userNamePasswordArr = userNamePassword.split(":");
+    console.log(userNamePasswordArr[0]);
+    console.log(userNamePasswordArr[1]);
     try {
         if (userNamePasswordArr[0] === process.env.ADMIN_EMAIL) {
             if (userNamePasswordArr[1] === process.env.ADMIN_PASSWORD) {
@@ -48,8 +50,8 @@ async function basicAuthentication(req, authHeader) {
                 req.authType = "basic";
             }
         } else {
-            const account = await accountService.getAccountByEmail(userNamePasswordArr[1]); 
-            await accountService.login(account, userNamePasswordArr[1]);
+            const account = await accountService.getAccountByEmail(userNamePasswordArr[0]); 
+            await accountService.login(userNamePasswordArr[0], userNamePasswordArr[1]);
             req.user = userNamePasswordArr[0];
             req.role = account.role;
             req.authType = "basic";

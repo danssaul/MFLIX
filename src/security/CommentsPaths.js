@@ -9,8 +9,16 @@ const CommentsPaths = {
   },
   POST: {
     authentication: () => 'jwt',
-    authorization: (req) => {
-      return req.role === 'premium_user';
+    authorization: async (req) => {
+      try {
+        const comment = await commentService.getCommentById(req.body.id);
+        return req.role === 'premium_user' && comment.email === req.user;
+      } catch (error) {
+        if (error.message === 'Comment not found') {
+          return { authorized: false, status: 404, message: 'Comment not found' };
+        }
+        return { authorized: false, status: 500, message: 'Internal server error' };
+      }
     }
   },
   DELETE: {

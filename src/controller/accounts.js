@@ -58,6 +58,10 @@ accountsRouter.delete('/:email', validateParam(schemas.schemaEmail), auth(Accoun
 }));
 
 accountsRouter.post('/login', validateBody(schemas.schemaLogin), asyncHandler(async (req, res) => {
+    const account = await service.getAccountByEmail(req.body.email);
+    if (account.blocked) {
+        throw createError(403, "Account is blocked");
+    }
     const token = await service.login(req.body.email, req.body.password);
     res.send({ token });
 }));
