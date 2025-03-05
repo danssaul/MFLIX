@@ -9,7 +9,7 @@ class FavoriteService {
         this.collection = collection;
     }
 
-    addFavorite = async (favorite) => {
+    async addFavorite(favorite) {
         const existingFavorite = await userFavorites.findOne({
             movie_id: new ObjectId(favorite.movie_id),
             email: favorite.email
@@ -25,13 +25,13 @@ class FavoriteService {
         return newFavorite;
     }
 
-    getFavoritesByEmail = async (email) => {
+    async getFavoritesByEmail(email) {
         const favorites = await this.collection.find({ email: email }).toArray();
         if (favorites.length === 0) throw createError(404, "favorites not found");
         return favorites;
     }
 
-    updateFavorite = async (id, viewed, feedback) => {
+    async updateFavorite(id, viewed, feedback) {
         const favorite = await this.collection.findOneAndUpdate(
             { _id: new ObjectId(id) },
             { $set: { viewed, feedback } },
@@ -41,7 +41,7 @@ class FavoriteService {
         return favorite;
     }
 
-    deleteFavorite = async (id, email) => {
+    async deleteFavorite(id, email) {
         const favorite = await this.collection.findOneAndDelete({ _id: new ObjectId(id) });
         if (!favorite) throw createError(404, "favorite not found");
 
@@ -51,12 +51,7 @@ class FavoriteService {
     }
 }
 
-const {
-    CONNECTION_STRING,
-    DB_NAME,
-    COLLECTION_NAME_FAVORITES,
-    COLLECTION_NAME_USER_FAVORITES
-} = process.env;
+const { CONNECTION_STRING, DB_NAME, COLLECTION_NAME_FAVORITES, COLLECTION_NAME_USER_FAVORITES } = process.env;
 
 const connection = new MongoConnection(CONNECTION_STRING, DB_NAME);
 const userFavorites = await connection.getCollection(COLLECTION_NAME_USER_FAVORITES);

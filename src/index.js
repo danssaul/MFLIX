@@ -10,10 +10,7 @@ import { errorHandler } from "./utils/error.js";
 import { authenticate } from "./security/authenticate.js";
 
 dotenv.config();
-const {
-    CONNECTION_STRING,
-    DB_NAME,
-} = process.env;
+const { CONNECTION_STRING, DB_NAME } = process.env;
 
 const connection = new MongoConnection(CONNECTION_STRING, DB_NAME);
 

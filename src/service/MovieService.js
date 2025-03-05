@@ -1,5 +1,4 @@
 import accountService from "./AccountService.js";
-import dotenv from "dotenv";
 import MongoConnection from "../db/MongoConnection.js";
 import { ObjectId } from "mongodb";
 import { createError } from '../utils/error.js';
@@ -11,11 +10,11 @@ class MovieService {
         this.collection = collection;
     }
 
-    getMovieByID = async (id) => {
+    async getMovieByID(id) {
         return await this.collection.findOne({ _id: new ObjectId(id) });
     }
 
-    getMoviesByImdbId = async (id) => {
+    async getMoviesByImdbId(id) {
         const movies = await this.collection.find({ "imdb.id": id }).toArray();
         if (movies.length === 0) throw createError(404, "Movie not found");
         return movies;
@@ -40,7 +39,6 @@ class MovieService {
     }
 
     async getMostCommentedMoviesByFilter({ year, actor, genres, language, amount }) {
-
         const matchQuery = {
             ...(year && { year }),
             ...(actor && { actor: { $regex: actor, $options: "i" } }),
@@ -55,9 +53,9 @@ class MovieService {
             .toArray();
 
         return filteredMovies;
-    };
+    }
 
-    updateMovieRating = async (imdbID, rating, email) => {
+    async updateMovieRating(imdbID, rating, email) {
         const movies = await this.getMoviesByImdbId(imdbID);
         const newRating = ((movies[0].imdb.rating * movies[0].imdb.votes + rating) / (movies[0].imdb.votes + 1));
 
@@ -69,19 +67,13 @@ class MovieService {
         );
 
         return result.modifiedCount;
-    };
+    }
 
 }
 
-const {
-    CONNECTION_STRING,
-    DB_NAME,
-    COLLECTION_NAME_MOVIES,
-    COLLECTION_NAME_ACCOUNTS
-} = process.env;
+const { CONNECTION_STRING, DB_NAME, COLLECTION_NAME_MOVIES } = process.env;
 
 const connection = new MongoConnection(CONNECTION_STRING, DB_NAME);
-const accounts = await connection.getCollection(COLLECTION_NAME_ACCOUNTS);
 const movies = await connection.getCollection(COLLECTION_NAME_MOVIES);
 const movieService = new MovieService(connection, movies);
 

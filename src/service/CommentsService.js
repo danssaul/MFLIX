@@ -1,7 +1,5 @@
 import MongoConnection from "../db/MongoConnection.js";
-import dotenv from "dotenv";
 import { ObjectId } from "mongodb";
-import accountService from "./AccountService.js";
 import { createError } from "../utils/error.js";
 
 
@@ -46,7 +44,7 @@ class CommentService {
         return comment;
     }
 
-    async getCommentById(id){
+    async getCommentById(id) {
         const comment = await this.collection.findOne({ _id: new ObjectId(id) });
         if (!comment) throw createError(404, 'Comment not found');
         return comment;
@@ -54,12 +52,7 @@ class CommentService {
 
 }
 
-const {
-    CONNECTION_STRING,
-    DB_NAME,
-    COLLECTION_NAME_MOVIES,
-    COLLECTION_NAME_COMMENTS,
-} = process.env;
+const { CONNECTION_STRING, DB_NAME, COLLECTION_NAME_MOVIES, COLLECTION_NAME_COMMENTS } = process.env;
 
 const connection = new MongoConnection(CONNECTION_STRING, DB_NAME);
 const comments = await connection.getCollection(COLLECTION_NAME_COMMENTS);
