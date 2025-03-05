@@ -1,9 +1,7 @@
 import accountService from '../service/AccountService.js';
 import JwtUtils from '../utils/token.js';
-import dotenv from 'dotenv';
 import { createError } from '../utils/error.js';
 
-dotenv.config();
 const BEARER = "Bearer ";
 const BASIC = "Basic ";
 

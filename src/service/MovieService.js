@@ -73,7 +73,6 @@ class MovieService {
 
 }
 
-dotenv.config();
 const {
     CONNECTION_STRING,
     DB_NAME,

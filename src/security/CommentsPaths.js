@@ -1,5 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config();
 import commentService from "../service/CommentsService.js";
 
 const CommentsPaths = {

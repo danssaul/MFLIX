@@ -146,7 +146,7 @@ class AccountService {
 
 }
 
-dotenv.config();
+
 const {
     CONNECTION_STRING,
     DB_NAME,

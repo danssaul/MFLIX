@@ -1,7 +1,4 @@
-import dotenv from "dotenv";
 import favoriteService from "../service/FavoriteService.js";
-import { createError } from "../utils/error.js";
-dotenv.config();
 
 const FavoritesPaths = {
     GET: {
