@@ -1,17 +1,14 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 const AccountPaths = {
   POST: {
     authentication: (req) => {
-      if (req.path === '/admin') {
+      if (req.path.includes('/admin')) {
         return 'basic';
       }
       return false;
     },
     authorization: (req) => {
-      if (req.path === '/admin') {
-        return req.user === process.env.ADMIN_EMAIL;
+      if (req.path.includes('/admin')) {
+        return req.user === process.env.ADMIN_EMAIL || req.role === 'admin';
       }
       return true;
     }
@@ -19,18 +16,20 @@ const AccountPaths = {
   GET: {
     authentication: () => 'jwt',
     authorization: (req) => {
-      return req.user === process.env.ADMIN_EMAIL || req.user === req.params.email;
+      return req.user === process.env.ADMIN_EMAIL || req.user === req.params.email || req.role === 'admin';
     }
   },
   PATCH: {
     authentication: () => 'jwt',
     authorization: (req) => {
       if (req.path.includes('/password')) {
-        return req.user === process.env.ADMIN_EMAIL || req.user === req.params.email;
+        return req.user === process.env.ADMIN_EMAIL || req.user === req.params.email || req.role === 'admin';
       } else if (req.path.includes('/roles')) {
-        return req.user === process.env.ADMIN_EMAIL;
+        return req.user === process.env.ADMIN_EMAIL || req.role === 'admin';
       } else if (req.path.includes('/block')) {
-        return req.user === process.env.ADMIN_EMAIL;
+        return req.user === process.env.ADMIN_EMAIL || req.role === 'admin';
+      } else if (req.path.includes('/unblock')) {
+        return req.user === process.env.ADMIN_EMAIL || req.role === 'admin';
       }
       return false;
     }
@@ -38,7 +37,7 @@ const AccountPaths = {
   DELETE: {
     authentication: () => 'jwt',
     authorization: (req) => {
-      return req.user === process.env.ADMIN_EMAIL || req.user === req.params.email;
+      return req.user === process.env.ADMIN_EMAIL || req.user === req.params.email || req.role === 'admin';
     }
   }
 };

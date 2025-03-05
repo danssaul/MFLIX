@@ -1,5 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config();
 import commentService from "../service/CommentsService.js";
 
 const CommentsPaths = {
@@ -9,8 +7,16 @@ const CommentsPaths = {
   },
   POST: {
     authentication: () => 'jwt',
-    authorization: (req) => {
-      return req.role === 'premium_user';
+    authorization: async (req) => {
+      try {
+        const comment = await commentService.getCommentById(req.body.id);
+        return req.role === 'premium_user' && comment.email === req.user;
+      } catch (error) {
+        if (error.message === 'Comment not found') {
+          return { authorized: false, status: 404, message: 'Comment not found' };
+        }
+        return { authorized: false, status: 500, message: 'Internal server error' };
+      }
     }
   },
   DELETE: {
@@ -20,7 +26,10 @@ const CommentsPaths = {
         const comment = await commentService.getCommentById(req.params.id);
         return req.role === 'admin' || (req.role === 'premium_user' && comment.email === req.user);
       } catch (error) {
-        return false;
+        if (error.message === 'Comment not found') {
+          return { authorized: false, status: 404, message: 'Comment not found' };
+        }
+        return { authorized: false, status: 500, message: 'Internal server error' };
       }
     }
   }
