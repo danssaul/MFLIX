@@ -25,7 +25,7 @@ class AccountService {
         if (accountChecked) {
             throw createError(409, "Account already exists");
         }
-        const newAccount = this.#prepareAccountForInsertion(account);
+        const newAccount = await this.#prepareAccountForInsertion(account);
         const { insertedId } = await this.collection.insertOne(newAccount);
         return await this.collection.findOne({ _id: insertedId });
     }
