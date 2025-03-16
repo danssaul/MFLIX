@@ -38,8 +38,6 @@ async function basicAuthentication(req, authHeader) {
         "utf-8"
     );
     const userNamePasswordArr = userNamePassword.split(":");
-    console.log(userNamePasswordArr[0]);
-    console.log(userNamePasswordArr[1]);
     try {
         if (userNamePasswordArr[0] === process.env.ADMIN_EMAIL) {
             if (userNamePasswordArr[1] === process.env.ADMIN_PASSWORD) {
@@ -69,10 +67,8 @@ export function auth(paths) {
             if (req.authType !== authentication(req)) {
                 return res.status(401).send({ error: "no required authentication" });
             }
-            console.log(`Authorization check for user: ${req.user}, role: ${req.role}, email: ${req.params.email}`);
             try {
                 const isAuthorized = await authorization(req);
-                console.log(`Authorization result: ${isAuthorized}`);
                 if (!isAuthorized) {
                     return res.status(403).send({ error: "not authorized" });
                 }

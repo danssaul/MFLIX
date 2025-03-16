@@ -32,9 +32,7 @@ moviesRouter.post('/most-commented', validateBody(schemas.schemaMostRatedAndComm
 moviesRouter.patch('/:imdb', rateLimiter, validateBody(schemas.schemaUpdateMovieRating), validateParam(schemas.schemaImdbId), asyncHandler(async (req, res) => {
     const { rating, email} = req.body;
     const imdb = parseInt(req.params.imdb);
-
     await movieService.updateMovieRating(imdb, rating, email);
-
     res.status(200).send({ message: 'Movie updated successfully' });
 }));
 

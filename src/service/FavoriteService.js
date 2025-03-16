@@ -1,5 +1,4 @@
 import MongoConnection from "../db/MongoConnection.js";
-import dotenv from 'dotenv';
 import { ObjectId } from "mongodb";
 import { createError } from '../utils/error.js';
 
