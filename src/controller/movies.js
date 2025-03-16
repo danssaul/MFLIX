@@ -6,24 +6,24 @@ import { auth } from '../security/authenticate.js';
 import MoviesPaths from '../security/MoviesPaths.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
 import asyncHandler from "express-async-handler";
+import { reqLimiter } from '../middleware/reqLimiter.js';
 
 const moviesRouter = express.Router();
 
 moviesRouter.use(auth(MoviesPaths));
-moviesRouter.use(rateLimiter);
 
-moviesRouter.get('/:id', validateParam(schemas.schemaId), asyncHandler(async (req, res) => {
+moviesRouter.get('/:id', validateParam(schemas.schemaId), reqLimiter, asyncHandler(async (req, res) => {
     const movie = await movieService.getMovieByID(req.params.id);
     res.send(movie).status(200);
 }));
 
-moviesRouter.post('/most-rated', validateBody(schemas.schemaMostRatedAndCommented), asyncHandler(async (req, res) => {
+moviesRouter.post('/most-rated', validateBody(schemas.schemaMostRatedAndCommented), reqLimiter, asyncHandler(async (req, res) => {
     const { year, actor, genres, language, amount } = req.body;
     const movies = await movieService.getMostRatedMoviesByFilter({ year, actor, genres, language, amount });
     res.status(200).send(movies);
 }));
 
-moviesRouter.post('/most-commented', validateBody(schemas.schemaMostRatedAndCommented), asyncHandler(async (req, res) => {
+moviesRouter.post('/most-commented', validateBody(schemas.schemaMostRatedAndCommented), reqLimiter, asyncHandler(async (req, res) => {
     const { year, actor, genres, language, amount } = req.body;
     const movies = await movieService.getMostCommentedMoviesByFilter({ year, actor, genres, language, amount });
     res.status(200).send(movies);

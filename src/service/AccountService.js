@@ -86,7 +86,8 @@ class AccountService {
             password: hashPassword,
             expiration: expiration,
             moviesVoted: [],
-            numGetRequest: 0
+            numGetRequest: 0,
+            lastResetTime: Date.now()
         };
 
         return Account;
@@ -136,6 +137,28 @@ class AccountService {
             { $inc: { "imdb.num_mflix_comments": 1 } }
         )
     }
+
+    async incrementRequestCount(email) {
+        await this.collection.updateOne(
+            { email },
+            {
+                $inc: { "numGetRequest": 1 }
+            }
+        )
+    }
+
+    async resetRequestCount(email, currentTime) {
+        await this.collection.updateOne(
+            { email },
+            {
+                $set: {
+                    numGetRequest: 0,
+                    lastResetTime: currentTime
+                }
+            }
+        );
+    }
+
 
 }
 
