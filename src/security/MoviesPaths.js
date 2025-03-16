@@ -14,7 +14,7 @@ const MoviesPaths = {
   PATCH: {
     authentication: () => 'jwt',
     authorization: (req) => {
-      return req.role === 'premium_user';
+      return req.role !== 'admin';
     }
   }
 };

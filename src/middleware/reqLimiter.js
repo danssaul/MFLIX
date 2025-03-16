@@ -13,11 +13,11 @@ export async function reqLimiter(req, res, next) {
         
         if (currentTime - account.lastResetTime > TIME_WINDOW) {
             await AccountService.resetRequestCount(account.email, currentTime);
-            account.numGetRequest = 0;
+            account.numRequest = 0;
             account.lastResetTime = currentTime;
         }
 
-        if (req.role === 'user' && account.numGetRequest >= REQS_LIMIT) {
+        if (req.role === 'user' && account.numRequest >= REQS_LIMIT) {
             return res.status(429).send({ error: 'Number of requests exceeded' });
         }
         

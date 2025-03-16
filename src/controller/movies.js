@@ -9,7 +9,6 @@ import asyncHandler from "express-async-handler";
 import { reqLimiter } from '../middleware/reqLimiter.js';
 
 const moviesRouter = express.Router();
-
 moviesRouter.use(auth(MoviesPaths));
 
 moviesRouter.get('/:id', validateParam(schemas.schemaId), reqLimiter, asyncHandler(async (req, res) => {
@@ -29,8 +28,8 @@ moviesRouter.post('/most-commented', validateBody(schemas.schemaMostRatedAndComm
     res.status(200).send(movies);
 }));
 
-moviesRouter.patch('/:imdb', rateLimiter, validateBody(schemas.schemaUpdateMovieRating), validateParam(schemas.schemaImdbId), asyncHandler(async (req, res) => {
-    const { rating, email} = req.body;
+moviesRouter.patch('/:imdb', validateBody(schemas.schemaUpdateMovieRating), rateLimiter, validateParam(schemas.schemaImdbId), asyncHandler(async (req, res) => {
+    const { rating, email } = req.body;
     const imdb = parseInt(req.params.imdb);
     await movieService.updateMovieRating(imdb, rating, email);
     res.status(200).send({ message: 'Movie updated successfully' });

@@ -68,10 +68,12 @@ class AccountService {
         if (!account) {
             throw createError(404, 'Account not found');
         }
-        await this.collection.updateOne(
-            { email },
-            { $push: { moviesVoted: movieId } }
-        );
+        if (!account.moviesVoted.includes(Number(movieId))) {
+            await this.collection.updateOne(
+                { email },
+                { $push: { moviesVoted: movieId } }
+            );
+        }
     }
 
     async #prepareAccountForInsertion(account) {
@@ -86,7 +88,7 @@ class AccountService {
             password: hashPassword,
             expiration: expiration,
             moviesVoted: [],
-            numGetRequest: 0,
+            numRequest: 0,
             lastResetTime: Date.now()
         };
 
@@ -142,7 +144,7 @@ class AccountService {
         await this.collection.updateOne(
             { email },
             {
-                $inc: { "numGetRequest": 1 }
+                $inc: { "numRequest": 1 }
             }
         )
     }
@@ -152,21 +154,17 @@ class AccountService {
             { email },
             {
                 $set: {
-                    numGetRequest: 0,
+                    numRequest: 0,
                     lastResetTime: currentTime
                 }
             }
         );
     }
 
-
 }
 
-
 const { CONNECTION_STRING, DB_NAME, COLLECTION_NAME_ACCOUNTS } = process.env;
-
 const connection = new MongoConnection(CONNECTION_STRING, DB_NAME);
 const users = await connection.getCollection(COLLECTION_NAME_ACCOUNTS);
-
 const accountService = new AccountService(connection, users);
 export default accountService;
