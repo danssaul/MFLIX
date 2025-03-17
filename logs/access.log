@@ -7,3 +7,5 @@
 ::1 - - [17/Mar/2025:14:28:46 +0000] "GET /accounts/ferrari12345678900@mercedes.com HTTP/1.1" 403 26 "-" "PostmanRuntime/7.43.2"
 ::1 - - [17/Mar/2025:14:29:29 +0000] "GET /accounts/ferrari12345678900@mercedes.com HTTP/1.1" 403 26 "-" "PostmanRuntime/7.43.2"
 ::1 - - [17/Mar/2025:14:29:41 +0000] "POST /accounts/login HTTP/1.1" 200 224 "-" "PostmanRuntime/7.43.2"
+::1 - - [17/Mar/2025:15:29:29 +0000] "GET / HTTP/1.1" 404 139 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
+::1 - - [17/Mar/2025:15:29:33 +0000] "GET / HTTP/1.1" 404 139 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"

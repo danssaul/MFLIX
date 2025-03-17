@@ -9,6 +9,7 @@ import { logger } from "./utils/logger.js";
 import appLogger from "./utils/appLogger.js";
 import { errorHandler } from "./utils/error.js";
 import { authenticate } from "./security/authenticate.js";
+import { swaggerUi, swaggerSpec } from '../src/utils/swagger.js';
 
 dotenv.config();
 const { CONNECTION_STRING, DB_NAME } = process.env;
@@ -20,6 +21,7 @@ connection.connectToDatabase().then(() => {
 });
 
 const app = express();
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(express.json());
 app.use(logger);
 app.use(authenticate());
@@ -28,6 +30,7 @@ app.use('/movies', moviesRouter);
 app.use('/comments', commentsRouter);
 app.use('/favorites', favoritesRouter);
 app.use(errorHandler);
+
 
 const port = process.env.PORT || 3500;
 app.listen(port, () => appLogger.info(`server is listening on port ${port}`));
