@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "nodemon --require dotenv/config ./src/index.js",
     "start": "node --require dotenv/config ./src/index.js",
-    "test": "vitest"
+    "test": "vitest",
+    "lint": "eslint ."
   },
   "type": "module",
   "keywords": [],
@@ -27,7 +28,10 @@
     "winston": "^3.17.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.22.0",
     "@types/node": "^18.19.80",
+    "eslint": "^9.22.0",
+    "globals": "^16.0.0",
     "nodemon": "^3.1.9"
   }
 }
