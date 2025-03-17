@@ -2,11 +2,11 @@
   "name": "mflix",
   "version": "1.0.0",
   "main": "index.js",
-"scripts": {
-  "dev": "nodemon --require dotenv/config ./src/index.js",
-  "start": "node --require dotenv/config ./src/index.js",
-  "test": "vitest"
-},
+  "scripts": {
+    "dev": "nodemon --require dotenv/config ./src/index.js",
+    "start": "node --require dotenv/config ./src/index.js",
+    "test": "vitest"
+  },
   "type": "module",
   "keywords": [],
   "author": "",
@@ -23,9 +23,11 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.13.1",
     "morgan": "^1.10.0",
+    "rotating-file-stream": "^3.2.6",
     "winston": "^3.17.0"
   },
   "devDependencies": {
+    "@types/node": "^18.19.80",
     "nodemon": "^3.1.9"
   }
 }

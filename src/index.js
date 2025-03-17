@@ -6,6 +6,7 @@ import moviesRouter from './controller/movies.js';
 import commentsRouter from "./controller/comments.js";
 import favoritesRouter from "./controller/favorites.js";
 import { logger } from "./utils/logger.js";
+import appLogger from "./utils/appLogger.js";
 import { errorHandler } from "./utils/error.js";
 import { authenticate } from "./security/authenticate.js";
 
@@ -15,7 +16,7 @@ const { CONNECTION_STRING, DB_NAME } = process.env;
 const connection = new MongoConnection(CONNECTION_STRING, DB_NAME);
 
 connection.connectToDatabase().then(() => {
-    console.log("Connected to the database successfully");
+    appLogger.info("Connected to the database successfully");
 });
 
 const app = express();
@@ -29,4 +30,4 @@ app.use('/favorites', favoritesRouter);
 app.use(errorHandler);
 
 const port = process.env.PORT || 3500;
-app.listen(port, () => console.log(`server is listening on port ${port}`));
+app.listen(port, () => appLogger.info(`server is listening on port ${port}`));
