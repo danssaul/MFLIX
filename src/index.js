@@ -10,6 +10,7 @@ import appLogger from "./utils/appLogger.js";
 import { errorHandler } from "./utils/error.js";
 import { authenticate } from "./security/authenticate.js";
 import { swaggerUi, swaggerSpec } from '../src/utils/swagger.js';
+import cors from 'cors';
 
 dotenv.config();
 const { CONNECTION_STRING, DB_NAME } = process.env;
@@ -21,6 +22,7 @@ connection.connectToDatabase().then(() => {
 });
 
 const app = express();
+app.use(cors());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(express.json());
 app.use(logger);
