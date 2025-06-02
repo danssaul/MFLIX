@@ -6,7 +6,8 @@
     "dev": "nodemon --require dotenv/config ./src/index.js",
     "start": "node --require dotenv/config ./src/index.js",
     "test": "vitest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "generate-docs": "node ./scripts/generate-docs.js"
   },
   "type": "module",
   "keywords": [],

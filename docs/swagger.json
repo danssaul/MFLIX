@@ -1,0 +1,2665 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "MFLIX API Documentation",
+    "version": "1.0.0",
+    "description": "Documentation for the MFLIX movie database application"
+  },
+  "servers": [
+    {
+      "url": "https://your-api-url.com",
+      "description": "Production server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Account": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john.doe@example.com"
+          },
+          "username": {
+            "type": "string",
+            "pattern": "^[a-zA-Z\\s]+$",
+            "minLength": 3,
+            "maxLength": 30,
+            "example": "John Doe"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "admin",
+              "premium_user"
+            ],
+            "example": "user"
+          },
+          "blocked": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "example": {
+          "email": "john.doe@example.com",
+          "username": "John Doe",
+          "role": "user",
+          "blocked": false
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "JWT token for authentication",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        },
+        "example": {
+          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        }
+      },
+      "MessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Response message",
+            "example": "Operation completed successfully"
+          }
+        },
+        "example": {
+          "message": "Operation completed successfully"
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$",
+            "description": "MongoDB ObjectId",
+            "example": "507f1f77bcf86cd799439011"
+          },
+          "username": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 30,
+            "pattern": "^[a-zA-Z\\s]+$",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john.doe@example.com"
+          },
+          "movie_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$",
+            "description": "MongoDB ObjectId of the movie",
+            "example": "507f1f77bcf86cd799439012"
+          },
+          "text": {
+            "type": "string",
+            "description": "The comment text",
+            "example": "Great movie! Really enjoyed the plot twists."
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-03-15T14:30:00Z"
+          }
+        }
+      },
+      "Favorite": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$",
+            "description": "MongoDB ObjectId",
+            "example": "507f1f77bcf86cd799439011"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email of the user who favorited the movie",
+            "example": "john.doe@example.com"
+          },
+          "movie_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$",
+            "description": "MongoDB ObjectId of the movie",
+            "example": "507f1f77bcf86cd799439012"
+          },
+          "feedback": {
+            "type": "string",
+            "description": "User's feedback about the movie",
+            "example": "One of my all-time favorites!"
+          },
+          "viewed": {
+            "type": "boolean",
+            "description": "Whether the user has watched the movie",
+            "example": true
+          },
+          "date_added": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date when the movie was added to favorites",
+            "example": "2024-03-15T14:30:00Z"
+          }
+        }
+      },
+      "Movie": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$",
+            "description": "MongoDB ObjectId",
+            "example": "507f1f77bcf86cd799439011"
+          },
+          "title": {
+            "type": "string",
+            "description": "Movie title",
+            "example": "The Shawshank Redemption"
+          },
+          "year": {
+            "type": "integer",
+            "description": "Release year",
+            "example": 1994
+          },
+          "imdb": {
+            "type": "integer",
+            "description": "IMDB ID",
+            "example": 111161
+          },
+          "rating": {
+            "type": "number",
+            "format": "float",
+            "minimum": 1,
+            "maximum": 10,
+            "description": "Average user rating",
+            "example": 9.3
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Movie genres",
+            "example": [
+              "Drama",
+              "Crime"
+            ]
+          },
+          "actors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Main actors",
+            "example": [
+              "Tim Robbins",
+              "Morgan Freeman"
+            ]
+          },
+          "language": {
+            "type": "string",
+            "description": "Movie language",
+            "example": "English"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/accounts/user": {
+      "post": {
+        "summary": "Create a new user account",
+        "description": "Creates a new user account with the provided email, username, and password",
+        "tags": [
+          "Accounts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password",
+                  "username"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "john.doe@example.com"
+                  },
+                  "username": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z\\s]+$",
+                    "minLength": 3,
+                    "maxLength": 30,
+                    "description": "Must contain only letters and spaces",
+                    "example": "John Doe"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "minLength": 8,
+                    "description": "Must contain at least 1 special character, 1 lowercase, 1 uppercase, 1 number, no whitespace, only Latin characters",
+                    "example": "Password123!"
+                  }
+                }
+              },
+              "example": {
+                "email": "john.doe@example.com",
+                "username": "John Doe",
+                "password": "Password123!"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                },
+                "example": {
+                  "email": "john.doe@example.com",
+                  "username": "John Doe",
+                  "role": "user",
+                  "blocked": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Invalid email format"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/admin": {
+      "post": {
+        "summary": "Create a new admin account",
+        "description": "Creates a new admin account. Requires admin privileges.",
+        "tags": [
+          "Accounts"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password",
+                  "username"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "admin@example.com"
+                  },
+                  "username": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z\\s]+$",
+                    "minLength": 3,
+                    "maxLength": 30,
+                    "description": "Must contain only letters and spaces",
+                    "example": "Admin User"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "minLength": 8,
+                    "description": "Must contain at least 1 special character, 1 lowercase, 1 uppercase, 1 number, no whitespace, only Latin characters",
+                    "example": "AdminPass123!"
+                  }
+                }
+              },
+              "example": {
+                "email": "admin@example.com",
+                "username": "Admin User",
+                "password": "AdminPass123!"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Admin account created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                },
+                "example": {
+                  "email": "admin@example.com",
+                  "username": "Admin User",
+                  "role": "admin",
+                  "blocked": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Password must contain at least one special character"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token or insufficient privileges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/{email}": {
+      "get": {
+        "summary": "Get account by email",
+        "description": "Retrieves account details. Users can only access their own accounts, admins can access any account.",
+        "tags": [
+          "Accounts"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "description": "Email address of the account to retrieve",
+            "example": "john.doe@example.com"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                },
+                "example": {
+                  "email": "john.doe@example.com",
+                  "username": "John Doe",
+                  "role": "user",
+                  "blocked": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token or insufficient privileges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Account not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Account not found"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an account",
+        "description": "Deletes an account. Users can only delete their own account, admins can delete any account.",
+        "tags": [
+          "Accounts"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "description": "Email of the account to delete",
+            "example": "john.doe@example.com"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                },
+                "example": {
+                  "message": "Account deleted successfully"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token or insufficient privileges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Account not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Account not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/roles/{email}": {
+      "patch": {
+        "summary": "Update account role",
+        "description": "Updates the role of an account. Requires admin privileges.",
+        "tags": [
+          "Accounts"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "description": "Email of the account to update",
+            "example": "john.doe@example.com"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "user",
+                      "admin",
+                      "premium_user"
+                    ],
+                    "example": "premium_user"
+                  }
+                }
+              },
+              "example": {
+                "role": "premium_user"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Role updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                },
+                "example": {
+                  "email": "john.doe@example.com",
+                  "username": "John Doe",
+                  "role": "premium_user",
+                  "blocked": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token or insufficient privileges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Account not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Account not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/password/{email}": {
+      "patch": {
+        "summary": "Update account password",
+        "description": "Updates account password. Users can only update their own password, admins can update any account.",
+        "tags": [
+          "Accounts"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "description": "Email of the account to update",
+            "example": "john.doe@example.com"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "password"
+                ],
+                "properties": {
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "minLength": 8,
+                    "description": "Must contain at least 1 special character, 1 lowercase, 1 uppercase, 1 number, no whitespace, only Latin characters",
+                    "example": "NewPass123!"
+                  }
+                }
+              },
+              "example": {
+                "password": "NewPass123!"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                },
+                "example": {
+                  "message": "Password updated successfully"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token or insufficient privileges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Account not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Account not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/block/{email}": {
+      "patch": {
+        "summary": "Block an account",
+        "description": "Blocks a user account. Requires admin privileges.",
+        "tags": [
+          "Accounts"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "description": "Email of the account to block",
+            "example": "john.doe@example.com"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account blocked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                },
+                "example": {
+                  "message": "Account blocked successfully"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token or insufficient privileges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Account already blocked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Account already blocked"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/unblock/{email}": {
+      "patch": {
+        "summary": "Unblock an account",
+        "description": "Unblocks a user account. Requires admin privileges.",
+        "tags": [
+          "Accounts"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "description": "Email of the account to unblock",
+            "example": "john.doe@example.com"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account unblocked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                },
+                "example": {
+                  "message": "Account unblocked successfully"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token or insufficient privileges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Account already unblocked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Account already unblocked"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/login": {
+      "post": {
+        "summary": "Login to account",
+        "description": "Authenticates user credentials and returns a JWT token",
+        "tags": [
+          "Accounts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "john.doe@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "minLength": 8,
+                    "description": "Must contain at least 1 special character, 1 lowercase, 1 uppercase, 1 number, no whitespace, only Latin characters",
+                    "example": "Password123!"
+                  }
+                }
+              },
+              "example": {
+                "email": "john.doe@example.com",
+                "password": "Password123!"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                },
+                "example": {
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Invalid credentials"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Account is blocked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Account is blocked"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/comments/comment": {
+      "post": {
+        "summary": "Add a new comment",
+        "description": "Creates a new comment for a movie. Requires authentication.",
+        "tags": [
+          "Comments"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "email",
+                  "movie_id",
+                  "text"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 30,
+                    "pattern": "^[a-zA-Z\\s]+$",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "john.doe@example.com"
+                  },
+                  "movie_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{24}$",
+                    "example": "507f1f77bcf86cd799439012"
+                  },
+                  "text": {
+                    "type": "string",
+                    "example": "Great movie! Really enjoyed the plot twists."
+                  }
+                }
+              },
+              "example": {
+                "username": "John Doe",
+                "email": "john.doe@example.com",
+                "movie_id": "507f1f77bcf86cd799439012",
+                "text": "Great movie! Really enjoyed the plot twists."
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Comment created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Invalid input format"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/comments/comment/{id}": {
+      "get": {
+        "summary": "Get comments by movie ID",
+        "description": "Retrieves all comments for a specific movie. Requires authentication.",
+        "tags": [
+          "Comments"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "description": "MongoDB ObjectId of the movie",
+            "example": "507f1f77bcf86cd799439012"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of comments retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Comment"
+                  }
+                },
+                "example": [
+                  {
+                    "id": "507f1f77bcf86cd799439011",
+                    "username": "John Doe",
+                    "email": "john.doe@example.com",
+                    "movie_id": "507f1f77bcf86cd799439012",
+                    "text": "Great movie! Really enjoyed the plot twists.",
+                    "date": "2024-03-15T14:30:00Z"
+                  },
+                  {
+                    "id": "507f1f77bcf86cd799439013",
+                    "username": "Jane Smith",
+                    "email": "jane.smith@example.com",
+                    "movie_id": "507f1f77bcf86cd799439012",
+                    "text": "Amazing cinematography and acting!",
+                    "date": "2024-03-15T15:45:00Z"
+                  }
+                ]
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Movie not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Movie not found"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a comment",
+        "description": "Deletes a specific comment by its ID. Requires authentication.",
+        "tags": [
+          "Comments"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "description": "MongoDB ObjectId of the comment to delete",
+            "example": "507f1f77bcf86cd799439011"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                },
+                "example": {
+                  "id": "507f1f77bcf86cd799439011",
+                  "username": "John Doe",
+                  "email": "john.doe@example.com",
+                  "movie_id": "507f1f77bcf86cd799439012",
+                  "text": "Great movie! Really enjoyed the plot twists.",
+                  "date": "2024-03-15T14:30:00Z"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Comment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Comment not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/comments": {
+      "post": {
+        "summary": "Update a comment",
+        "description": "Updates the text of an existing comment. Requires authentication.",
+        "tags": [
+          "Comments"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "text"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{24}$",
+                    "example": "507f1f77bcf86cd799439011"
+                  },
+                  "text": {
+                    "type": "string",
+                    "example": "Updated review - Even better on second watch!"
+                  }
+                }
+              },
+              "example": {
+                "id": "507f1f77bcf86cd799439011",
+                "text": "Updated review - Even better on second watch!"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Comment updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Invalid input format"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Comment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Comment not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/comments/{email}": {
+      "get": {
+        "summary": "Get comments by email",
+        "description": "Retrieves all comments made by a specific user.",
+        "tags": [
+          "Comments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "description": "Email of the user whose comments to retrieve",
+            "example": "john.doe@example.com"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of comments retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Comment"
+                  }
+                },
+                "example": [
+                  {
+                    "id": "507f1f77bcf86cd799439011",
+                    "username": "John Doe",
+                    "email": "john.doe@example.com",
+                    "movie_id": "507f1f77bcf86cd799439012",
+                    "text": "Great movie! Really enjoyed the plot twists.",
+                    "date": "2024-03-15T14:30:00Z"
+                  },
+                  {
+                    "id": "507f1f77bcf86cd799439014",
+                    "username": "John Doe",
+                    "email": "john.doe@example.com",
+                    "movie_id": "507f1f77bcf86cd799439015",
+                    "text": "Another fantastic film!",
+                    "date": "2024-03-16T10:15:00Z"
+                  }
+                ]
+              }
+            }
+          },
+          "404": {
+            "description": "No comments found for this email",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "No comments found"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/favorites/favorite": {
+      "post": {
+        "summary": "Add movie to favorites",
+        "description": "Adds a movie to user's favorites list. Requires authentication.",
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "movie_id",
+                  "feedback"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "john.doe@example.com"
+                  },
+                  "movie_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{24}$",
+                    "example": "507f1f77bcf86cd799439012"
+                  },
+                  "feedback": {
+                    "type": "string",
+                    "example": "One of my all-time favorites!"
+                  }
+                }
+              },
+              "examples": {
+                "newFavorite": {
+                  "summary": "Example of adding a new favorite",
+                  "value": {
+                    "email": "john.doe@example.com",
+                    "movie_id": "507f1f77bcf86cd799439012",
+                    "feedback": "One of my all-time favorites!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Movie added to favorites successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Favorite"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Example of successful response",
+                    "value": {
+                      "id": "507f1f77bcf86cd799439011",
+                      "email": "john.doe@example.com",
+                      "movie_id": "507f1f77bcf86cd799439012",
+                      "feedback": "One of my all-time favorites!",
+                      "viewed": false,
+                      "date_added": "2024-03-15T14:30:00Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "invalidFormat": {
+                    "summary": "Example of invalid format error",
+                    "value": {
+                      "message": "Invalid input format"
+                    }
+                  },
+                  "duplicateFavorite": {
+                    "summary": "Example of duplicate favorite error",
+                    "value": {
+                      "message": "Movie already in favorites"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update favorite movie details",
+        "description": "Updates the viewed status and feedback for a favorite movie. Requires authentication.",
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{24}$",
+                    "example": "507f1f77bcf86cd799439011"
+                  },
+                  "viewed": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "feedback": {
+                    "type": "string",
+                    "example": "Even better on second watch!"
+                  }
+                }
+              },
+              "examples": {
+                "updateViewed": {
+                  "summary": "Example of updating viewed status",
+                  "value": {
+                    "id": "507f1f77bcf86cd799439011",
+                    "viewed": true
+                  }
+                },
+                "updateFeedback": {
+                  "summary": "Example of updating feedback",
+                  "value": {
+                    "id": "507f1f77bcf86cd799439011",
+                    "feedback": "Even better on second watch!"
+                  }
+                },
+                "updateBoth": {
+                  "summary": "Example of updating both viewed and feedback",
+                  "value": {
+                    "id": "507f1f77bcf86cd799439011",
+                    "viewed": true,
+                    "feedback": "Even better on second watch!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Favorite updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Favorite"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Example of successful update",
+                    "value": {
+                      "id": "507f1f77bcf86cd799439011",
+                      "email": "john.doe@example.com",
+                      "movie_id": "507f1f77bcf86cd799439012",
+                      "feedback": "Even better on second watch!",
+                      "viewed": true,
+                      "date_added": "2024-03-15T14:30:00Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Invalid input format"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Favorite not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Favorite not found"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove movie from favorites",
+        "description": "Removes a movie from user's favorites list. Requires authentication.",
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "email"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{24}$",
+                    "example": "507f1f77bcf86cd799439011"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "john.doe@example.com"
+                  }
+                }
+              },
+              "example": {
+                "id": "507f1f77bcf86cd799439011",
+                "email": "john.doe@example.com"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Favorite removed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Favorite"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Example of successfully removed favorite",
+                    "value": {
+                      "id": "507f1f77bcf86cd799439011",
+                      "email": "john.doe@example.com",
+                      "movie_id": "507f1f77bcf86cd799439012",
+                      "feedback": "One of my all-time favorites!",
+                      "viewed": true,
+                      "date_added": "2024-03-15T14:30:00Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Invalid input format"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Favorite not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Favorite not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/favorites/{email}": {
+      "get": {
+        "summary": "Get user's favorites",
+        "description": "Retrieves all favorite movies for a specific user. Requires authentication.",
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "description": "Email of the user whose favorites to retrieve",
+            "example": "john.doe@example.com"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of favorites retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Favorite"
+                  }
+                },
+                "examples": {
+                  "multipleFavorites": {
+                    "summary": "Example of multiple favorites",
+                    "value": [
+                      {
+                        "id": "507f1f77bcf86cd799439011",
+                        "email": "john.doe@example.com",
+                        "movie_id": "507f1f77bcf86cd799439012",
+                        "feedback": "One of my all-time favorites!",
+                        "viewed": true,
+                        "date_added": "2024-03-15T14:30:00Z"
+                      },
+                      {
+                        "id": "507f1f77bcf86cd799439013",
+                        "email": "john.doe@example.com",
+                        "movie_id": "507f1f77bcf86cd799439014",
+                        "feedback": "Can't wait to watch this one",
+                        "viewed": false,
+                        "date_added": "2024-03-16T10:15:00Z"
+                      }
+                    ]
+                  },
+                  "noFavorites": {
+                    "summary": "Example when user has no favorites",
+                    "value": []
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No favorites found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "No favorites found for this user"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/movies/{id}": {
+      "get": {
+        "summary": "Get movie by ID",
+        "description": "Retrieves detailed information about a specific movie. Requires authentication and is rate limited.",
+        "tags": [
+          "Movies"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "description": "MongoDB ObjectId of the movie",
+            "example": "507f1f77bcf86cd799439011"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Movie details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Movie"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Example of a movie",
+                    "value": {
+                      "id": "507f1f77bcf86cd799439011",
+                      "title": "The Shawshank Redemption",
+                      "year": 1994,
+                      "imdb": 111161,
+                      "rating": 9.3,
+                      "genres": [
+                        "Drama",
+                        "Crime"
+                      ],
+                      "actors": [
+                        "Tim Robbins",
+                        "Morgan Freeman"
+                      ],
+                      "language": "English"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Movie not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Movie not found"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Too many requests. Please try again later."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/movies/most-rated": {
+      "post": {
+        "summary": "Get most rated movies by filter",
+        "description": "Retrieves a list of most rated movies based on various filters. Requires authentication and is rate limited.",
+        "tags": [
+          "Movies"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount"
+                ],
+                "properties": {
+                  "year": {
+                    "type": "integer",
+                    "description": "Filter by release year",
+                    "example": 1994
+                  },
+                  "actor": {
+                    "type": "string",
+                    "description": "Filter by actor name",
+                    "example": "Morgan Freeman"
+                  },
+                  "genres": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Filter by genres",
+                    "example": [
+                      "Drama",
+                      "Crime"
+                    ]
+                  },
+                  "language": {
+                    "type": "string",
+                    "description": "Filter by language",
+                    "example": "English"
+                  },
+                  "amount": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Number of movies to return",
+                    "example": 10
+                  }
+                }
+              },
+              "examples": {
+                "allFilters": {
+                  "summary": "Example with all filters",
+                  "value": {
+                    "year": 1994,
+                    "actor": "Morgan Freeman",
+                    "genres": [
+                      "Drama",
+                      "Crime"
+                    ],
+                    "language": "English",
+                    "amount": 10
+                  }
+                },
+                "minimalFilters": {
+                  "summary": "Example with minimal filters",
+                  "value": {
+                    "amount": 5
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of movies retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Movie"
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Example of movie list",
+                    "value": [
+                      {
+                        "id": "507f1f77bcf86cd799439011",
+                        "title": "The Shawshank Redemption",
+                        "year": 1994,
+                        "imdb": 111161,
+                        "rating": 9.3,
+                        "genres": [
+                          "Drama",
+                          "Crime"
+                        ],
+                        "actors": [
+                          "Tim Robbins",
+                          "Morgan Freeman"
+                        ],
+                        "language": "English"
+                      },
+                      {
+                        "id": "507f1f77bcf86cd799439012",
+                        "title": "The Godfather",
+                        "year": 1972,
+                        "imdb": 111162,
+                        "rating": 9.2,
+                        "genres": [
+                          "Crime",
+                          "Drama"
+                        ],
+                        "actors": [
+                          "Marlon Brando",
+                          "Al Pacino"
+                        ],
+                        "language": "English"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Invalid input format"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Too many requests. Please try again later."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/movies/most-commented": {
+      "post": {
+        "summary": "Get most commented movies by filter",
+        "description": "Retrieves a list of most commented movies based on various filters. Requires authentication and is rate limited.",
+        "tags": [
+          "Movies"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount"
+                ],
+                "properties": {
+                  "year": {
+                    "type": "integer",
+                    "description": "Filter by release year",
+                    "example": 1994
+                  },
+                  "actor": {
+                    "type": "string",
+                    "description": "Filter by actor name",
+                    "example": "Morgan Freeman"
+                  },
+                  "genres": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Filter by genres",
+                    "example": [
+                      "Drama",
+                      "Crime"
+                    ]
+                  },
+                  "language": {
+                    "type": "string",
+                    "description": "Filter by language",
+                    "example": "English"
+                  },
+                  "amount": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Number of movies to return",
+                    "example": 10
+                  }
+                }
+              },
+              "examples": {
+                "allFilters": {
+                  "summary": "Example with all filters",
+                  "value": {
+                    "year": 1994,
+                    "actor": "Morgan Freeman",
+                    "genres": [
+                      "Drama",
+                      "Crime"
+                    ],
+                    "language": "English",
+                    "amount": 10
+                  }
+                },
+                "genreFilter": {
+                  "summary": "Example with genre filter",
+                  "value": {
+                    "genres": [
+                      "Action",
+                      "Adventure"
+                    ],
+                    "amount": 5
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of movies retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Movie"
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Example of movie list",
+                    "value": [
+                      {
+                        "id": "507f1f77bcf86cd799439011",
+                        "title": "The Dark Knight",
+                        "year": 2008,
+                        "imdb": 111163,
+                        "rating": 9,
+                        "genres": [
+                          "Action",
+                          "Crime",
+                          "Drama"
+                        ],
+                        "actors": [
+                          "Christian Bale",
+                          "Heath Ledger"
+                        ],
+                        "language": "English"
+                      },
+                      {
+                        "id": "507f1f77bcf86cd799439014",
+                        "title": "Inception",
+                        "year": 2010,
+                        "imdb": 111164,
+                        "rating": 8.8,
+                        "genres": [
+                          "Action",
+                          "Adventure",
+                          "Sci-Fi"
+                        ],
+                        "actors": [
+                          "Leonardo DiCaprio",
+                          "Joseph Gordon-Levitt"
+                        ],
+                        "language": "English"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Invalid input format"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Too many requests. Please try again later."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/movies/{imdb}": {
+      "patch": {
+        "summary": "Update movie rating",
+        "description": "Updates the rating of a movie. Requires authentication and has rate limiting.",
+        "tags": [
+          "Movies"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "imdb",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "IMDB ID of the movie",
+            "example": 111161
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "rating",
+                  "email"
+                ],
+                "properties": {
+                  "rating": {
+                    "type": "number",
+                    "format": "float",
+                    "minimum": 1,
+                    "maximum": 10,
+                    "description": "New rating for the movie",
+                    "example": 9.5
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email of the user rating the movie",
+                    "example": "john.doe@example.com"
+                  }
+                }
+              },
+              "examples": {
+                "highRating": {
+                  "summary": "Example of high rating",
+                  "value": {
+                    "rating": 9.5,
+                    "email": "john.doe@example.com"
+                  }
+                },
+                "lowRating": {
+                  "summary": "Example of low rating",
+                  "value": {
+                    "rating": 3.5,
+                    "email": "jane.smith@example.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Rating updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Movie updated successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "invalidRating": {
+                    "summary": "Example of invalid rating",
+                    "value": {
+                      "message": "Rating must be between 1 and 10"
+                    }
+                  },
+                  "invalidFormat": {
+                    "summary": "Example of invalid format",
+                    "value": {
+                      "message": "Invalid input format"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Movie not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Movie not found"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Too many rating attempts. Please try again later."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Accounts",
+      "description": "Account management and authentication endpoints"
+    },
+    {
+      "name": "Comments",
+      "description": "Movie comments management endpoints"
+    },
+    {
+      "name": "Favorites",
+      "description": "Movie favorites management endpoints"
+    },
+    {
+      "name": "Movies",
+      "description": "Movie management and search endpoints"
+    }
+  ]
+}
