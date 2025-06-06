@@ -3,6 +3,8 @@
 ## Overview
 MFLIX is a movie database application that allows users to browse, search, and manage movie-related data. It includes features for user authentication, data management, and error handling, all powered by a MongoDB backend.
 
+See Docs: https://danssaul.github.io/MFLIX/
+
 ---
 
 ## Business Rules
